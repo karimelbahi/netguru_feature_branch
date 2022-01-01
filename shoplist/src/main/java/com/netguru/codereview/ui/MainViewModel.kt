@@ -8,16 +8,24 @@ import com.netguru.codereview.network.ShopListApiMock
 import com.netguru.codereview.network.ShopListRepository
 import com.netguru.codereview.network.model.ShopListItemResponse
 import com.netguru.codereview.network.model.ShopListResponse
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+//import com.netguru.codereview.di.component.DaggerAppComponent
 
-class MainViewModel : ViewModel() {
+class MainViewModel @Inject constructor() : ViewModel() {
+
+//    var appComponent: AppComponent = DaggerAppComponent.create()
 
     private val shopListRepository = ShopListRepository(ShopListApiMock())
 
-    val shopLists = MutableLiveData<List<Pair<ShopListResponse, List<ShopListItemResponse>>>>()
-    private val eventLiveData = MutableLiveData<String>()
+    private val _shopLists = MutableLiveData<List<Pair<ShopListResponse, List<ShopListItemResponse>>>>()
+    val shopLists: LiveData<List<Pair<ShopListResponse, List<ShopListItemResponse>>>>
+        get() = _shopLists
+
+    private val _eventLiveData = MutableLiveData<String>()
+    val events: LiveData<String>
+        get() = _eventLiveData
 
     init {
         viewModelScope.launch {
@@ -27,16 +35,16 @@ class MainViewModel : ViewModel() {
                 val items = shopListRepository.getShopListItems(list.list_id)
                 data.add(list to items)
             }
-            shopLists.postValue(data)
+            _shopLists.postValue(data)
         }
         getUpdateEvents()
     }
 
-    fun events(): LiveData<String> = eventLiveData
+
     private fun getUpdateEvents() {
-        GlobalScope.launch {
+        viewModelScope.launch {
             shopListRepository.updateEvents().collect {
-                eventLiveData.postValue(it)
+                _eventLiveData.postValue(it)
             }
         }
     }

@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.flow
 class ShopListApiMock : ShopListApi {
     override suspend fun getShopLists(): List<ShopListResponse> =
         coroutineScope {
-            List(9999) { index ->
+            Thread.sleep(2)
+
+            List(100) { index ->
                 ShopListResponse(
                     list_id = index.toString(),
                     userId = index,
