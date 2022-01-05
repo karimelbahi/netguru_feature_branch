@@ -24,7 +24,6 @@ class ShopListCategoryAdapter(val context: Context) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val currentItem = getItem(position)
         holder.bind(getItem(position))
     }
 
